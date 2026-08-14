@@ -42,6 +42,17 @@ app.get("/", (req, res) => {
     });
 });
 
+app.get("/test-session", (req, res) => {
+    console.log("===== TEST SESSION =====");
+    console.log("SESSION ID:", req.sessionID);
+    console.log("SESSION:", req.session);
+
+    res.json({
+        sessionId: req.sessionID,
+        userId: req.session?.userId || null
+    });
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
