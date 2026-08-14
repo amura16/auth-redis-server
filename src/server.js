@@ -11,35 +11,62 @@ const app = express();
 
 app.use(express.json());
 
-app.use(cors({
-    origin: "https://auth-redis.onrender.com",
-    credentials: true
-}));
+/*
+ * CORS
+ */
+app.use(
+    cors({
+        origin: "https://auth-redis.onrender.com",
+        credentials: true
+    })
+);
 
+/*
+ * Session
+ */
 app.use(
     session({
         store: sessionStore,
         secret: process.env.SESSION_SECRET,
+
         resave: false,
         saveUninitialized: false,
+
         cookie: {
             httpOnly: true,
-            secure: false,
+
+            // HTTPS sur Render
+            secure: true,
+
+            // Frontend et backend sont sur des origines différentes
+            sameSite: "none",
+
             maxAge: 1000 * 60 * 60
         }
     })
 );
 
+/*
+ * Routes
+ */
 app.use("/auth", authRoutes);
 
+/*
+ * Test API
+ */
 app.get("/", (req, res) => {
     res.json({
         message: "Auth API fonctionne"
     });
 });
 
-app.listen(process.env.PORT, () => {
+/*
+ * Port Render
+ */
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
     console.log(
-        `Server running on http://localhost:${process.env.PORT}`
+        `Server running on port ${PORT}`
     );
 });
