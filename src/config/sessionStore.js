@@ -7,20 +7,13 @@ class UpstashSessionStore extends session.Store {
         redis
             .get(`session:${sid}`)
             .then((data) => {
-
-                console.log("SESSION GET:", sid);
-                console.log("SESSION DATA:", data);
-
                 if (!data) {
                     return callback(null, null);
                 }
 
                 callback(null, data);
             })
-            .catch((error) => {
-                console.error("SESSION GET ERROR:", error);
-                callback(error);
-            });
+            .catch(callback);
     }
 
     set(sid, sessionData, callback) {
@@ -30,42 +23,21 @@ class UpstashSessionStore extends session.Store {
             ? Math.ceil(maxAge / 1000)
             : 3600;
 
-        console.log("SESSION SET:", sid);
-        console.log("SESSION DATA:", sessionData);
-
         redis
             .set(
                 `session:${sid}`,
                 sessionData,
-                {
-                    ex: ttl
-                }
+                { ex: ttl }
             )
-            .then(() => {
-
-                console.log("SESSION SAVED:", sid);
-
-                callback(null);
-            })
-            .catch((error) => {
-                console.error("SESSION SET ERROR:", error);
-                callback(error);
-            });
+            .then(() => callback(null))
+            .catch(callback);
     }
 
     destroy(sid, callback) {
         redis
             .del(`session:${sid}`)
-            .then(() => {
-
-                console.log("SESSION DESTROY:", sid);
-
-                callback(null);
-            })
-            .catch((error) => {
-                console.error("SESSION DESTROY ERROR:", error);
-                callback(error);
-            });
+            .then(() => callback(null))
+            .catch(callback);
     }
 
     touch(sid, sessionData, callback) {
@@ -77,13 +49,8 @@ class UpstashSessionStore extends session.Store {
 
         redis
             .expire(`session:${sid}`, ttl)
-            .then(() => {
-                callback(null);
-            })
-            .catch((error) => {
-                console.error("SESSION TOUCH ERROR:", error);
-                callback(error);
-            });
+            .then(() => callback(null))
+            .catch(callback);
     }
 }
 
